@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->string('name'); // Contoh: "Warna", "Ukuran"
+            $table->string('value'); // Contoh: "Merah", "XL"
             $table->timestamps();
         });
     }

@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('stock_transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('user_id')->constrained('users');
+            $table->enum('type', ['in', 'out'])->comment('in = barang masuk, out = barang keluar');
+            $table->integer('quantity');
+            $table->date('date');
+            $table->enum('status', ['completed', 'pending', 'cancelled'])->default('completed');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
