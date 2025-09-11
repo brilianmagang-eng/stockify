@@ -15,18 +15,17 @@ class DashboardController extends Controller
      * Logika ini mirip dengan mengambil data ringkasan di React.
      */
     public function index()
-    {
-        // Mengambil data ringkasan seperti di dokumen Stockify [cite: 56]
-        $productCount = Product::count(); //[cite: 57]
-        $supplierCount = Supplier::count();
-        $incomingTransactions = StockTransaction::where('type', 'in')->count(); //[cite: 58]
-        $outgoingTransactions = StockTransaction::where('type', 'out')->count(); //[cite: 58]
+{
+    $productCount = \App\Models\Product::count();
+    $supplierCount = \App\Models\Supplier::count();
+    $incomingTransactions = \App\Models\StockTransaction::where('type', 'in')->count();
+    $outgoingTransactions = \App\Models\StockTransaction::where('type', 'out')->count();
 
-        return view('pages.admin.dashboard', [
-            'productCount' => $productCount,
-            'supplierCount' => $supplierCount,
-            'incomingTransactions' => $incomingTransactions,
-            'outgoingTransactions' => $outgoingTransactions,
-        ]);
-    }
+    return view('pages.admin.dashboard', compact(
+        'productCount', 
+        'supplierCount', 
+        'incomingTransactions', 
+        'outgoingTransactions'
+    ));
+}
 }

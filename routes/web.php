@@ -1,40 +1,68 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-// Baris-baris ini ditambahkan untuk memberitahu Laravel Controller mana yang akan kita gunakan.
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
-
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\StockTransactionController;
+use App\Http\Controllers\Manager\StockController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
+| Di sinilah Anda mendaftarkan rute web untuk aplikasi Anda.
 |
 */
 
-// Rute default yang sudah ada, biarkan saja.
+// --- PERUBAHAN DI SINI ---
+// Halaman utama ('/') sekarang akan otomatis mengarahkan ke halaman login.
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-// === KODE DARI LANGKAH 3 DITAMBAHKAN DI SINI ===
+// Rute untuk menampilkan form login dan memprosesnya
+Route::get('login', [LoginController::class, 'create'])->name('login');
+Route::post('login', [LoginController::class, 'store']);
+Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
-// [cite_start];// Rute untuk menampilkan dashboard admin [cite: 55]
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-// [cite_start];// Rute untuk manajemen pengguna (CRUD) oleh Admin [cite: 11, 73]
-// Route::resource('/admin/users', UserController::class);
+// Grup Rute yang Dilindungi Middleware Autentikasi
+Route::middleware('auth')->group(function () {
+    
+    // Grup Rute untuk ADMIN
+    // Hanya pengguna dengan peran 'admin' yang bisa mengakses URL berawalan /admin
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // Rute resource untuk semua fitur CRUD Admin
+        Route::resource('products', ProductController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('suppliers', SupplierController::class);
+        
+        // Rute untuk Stock Management
+        Route::get('stock', [StockController::class, 'index'])->name('stock.index');
+        Route::get('stock/create', [StockController::class, 'create'])->name('stock.create');
+        Route::post('stock', [StockController::class, 'store'])->name('stock.store');
+    });
 
-// // [cite_start];// Rute untuk manajemen produk (CRUD) oleh Admin [cite: 9, 62]
-// Route::resource('/admin/products', ProductController::class);
+     // Grup Rute untuk MANAGER
+    // Route::middleware('role:manager')->prefix('manager')->name('manager.')->group(function () {
+    //     Route::get('dashboard', [\App\Http\Controllers\Manager\DashboardController::class, 'index'])->name('dashboard');
+    //     Route::get('products', [\App\Http\Controllers\Manager\ProductController::class, 'index'])->name('products.index');
+    //     Route::get('stock/in/create', [\App\Http\Controllers\Manager\StockController::class, 'createIn'])->name('stock.createIn');
+    //     Route::post('stock/in', [\App\Http\Controllers\Manager\StockController::class, 'storeIn'])->name('stock.storeIn');
+    //     Route::get('stock/out/create', [\App\Http\Controllers\Manager\StockController::class, 'createOut'])->name('stock.createOut');
+    //     Route::post('stock/out', [\App\Http\Controllers\Manager\StockController::class, 'storeOut'])->name('stock.storeOut');
+    // });
 
-// Anda bisa menambahkan rute lain di sini sesuai kebutuhan, misalnya untuk supplier
-// use App\Http\Controllers\Admin\SupplierController;
-// Route::resource('/admin/suppliers', SupplierController::class);
+    // Grup Rute untuk STAFF
+    // Route::middleware('role:staff')->prefix('staff')->name('staff.')->group(function () {
+    //     Route::get('dashboard', [\App\Http\Controllers\Staff\DashboardController::class, 'index'])->name('dashboard');
+    //     // Anda bisa menambahkan rute lain untuk staff di sini, misalnya konfirmasi
+    // });
+
+});
