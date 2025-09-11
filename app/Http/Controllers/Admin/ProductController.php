@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        // Mengambil semua produk dengan relasi kategori dan supplier untuk efisiensi
         $products = Product::with(['category', 'supplier'])->latest()->paginate(10);
         return view('pages.admin.products.index', compact('products'));
     }
@@ -21,78 +21,87 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $suppliers = Supplier::all();
-        return view('pages.admin.products.create', compact('categories', 'suppliers'));
+        
+        // --- PERBAIKAN DI SINI ---
+        // Mengarahkan ke view 'create.blade.php'
+        return view('pages.admin.products.create', [
+            'product' => new Product(),
+            'categories' => $categories,
+            'suppliers' => $suppliers
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:product,sku',
-            'purchase_price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'minimum_stock' => 'required|integer',
+            'sku' => 'required|string|max:255|unique:products,sku',
+            'description' => 'nullable|string',
+            'purchase_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'minimum_stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'supplier_id' => 'required|exists:suppliers,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->all();
-
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('product', 'public');
+            $validatedData['image'] = $request->file('image')->store('product-images', 'public');
         }
 
-        Product::create($data);
+        Product::create($validatedData);
 
-        return redirect()->route('admin.products.create')->with('success', 'Product created successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
     }
 
-    public function edit(Product $products)
+    public function edit(Product $product)
     {
         $categories = Category::all();
         $suppliers = Supplier::all();
-        return view('pages.admin.products.edit', compact('product', 'categories', 'suppliers'));
+
+        // --- PERBAIKAN DI SINI ---
+        // Mengarahkan ke view 'edit.blade.php'
+        return view('pages.admin.products.edit', [
+            'product' => $product,
+            'categories' => $categories,
+            'suppliers' => $suppliers
+        ]);
     }
 
-    public function update(Request $request, Product $products)
+    public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:product,sku,' . $products->id,
-            'purchase_price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'minimum_stock' => 'required|integer',
+            'sku' => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
+            'description' => 'nullable|string',
+            'purchase_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'minimum_stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'supplier_id' => 'required|exists:suppliers,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->all();
-
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($products->image && file_exists(storage_path('app/public/' . $products->image))) {
-                unlink(storage_path('app/public/' . $products->image));
+            if ($product->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
             }
-            $data['image'] = $request->file('image')->store('product', 'public');
+            $validatedData['image'] = $request->file('image')->store('product-images', 'public');
         }
 
-        $products->update($data);
+        $product->update($validatedData);
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
     }
 
-    public function destroy(Product $products)
+    public function destroy(Product $product)
     {
-        // Hapus gambar dari storage
-        if ($products->image && file_exists(storage_path('app/public/' . $products->image))) {
-            unlink(storage_path('app/public/' . $products->image));
+        if ($product->image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
         }
-        
-        $products->delete();
+        $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 }

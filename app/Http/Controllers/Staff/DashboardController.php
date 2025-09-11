@@ -10,11 +10,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Untuk contoh ini, kita asumsikan 'pending' adalah tugas untuk staff
-        // Dalam aplikasi nyata, mungkin ada tabel 'tasks' terpisah
-        $incomingTasks = StockTransaction::where('type', 'in')->where('status', 'pending')->latest()->get();
-        $outgoingTasks = StockTransaction::where('type', 'out')->where('status', 'pending')->latest()->get();
+        // Hanya menampilkan daftar tugas yang perlu dikerjakan
+        $pendingTasks = StockTransaction::with('product')
+            ->where('status', 'pending')
+            ->latest('date')
+            ->get();
 
-        return view('pages.staff.dashboard', compact('incomingTasks', 'outgoingTasks'));
+        return view('pages.staff.dashboard', compact('pendingTasks'));
     }
 }

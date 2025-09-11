@@ -9,30 +9,50 @@ class Product extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'products'; // <-- TAMBAHKAN BARIS INI
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name', 'sku', 'description', 'purchase_price', 'selling_price',
         'stock', 'minimum_stock', 'image', 'category_id', 'supplier_id'
     ];
 
-    // Relasi ke Kategori
+    /**
+     * Get the category that owns the product.
+     */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Relasi ke Supplier
+    /**
+     * Get the supplier that provides the product.
+     */
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
 
-    // Relasi ke Atribut Produk
+    /**
+     * Get the attributes for the product.
+     */
     public function attributes()
     {
-        return $this->hasMany(ProductAttributes::class);
+        return $this->hasMany(ProductAttribute::class); // Pastikan nama model ini benar
     }
 
-    // Relasi ke Transaksi Stok
+    /**
+     * Get the stock transactions for the product.
+     */
     public function stockTransactions()
     {
         return $this->hasMany(StockTransaction::class);
