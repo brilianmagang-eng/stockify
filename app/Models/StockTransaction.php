@@ -13,6 +13,16 @@ class StockTransaction extends Model
         'product_id', 'user_id', 'type', 'quantity', 'date', 'status', 'notes'
     ];
 
+    /**
+     * The attributes that should be cast.
+     * Ini akan mengubah kolom 'date' menjadi objek Carbon secara otomatis.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'date' => 'datetime', // <-- INI YANG PERLU DITAMBAHKAN
+    ];
+
     // Relasi ke Produk
     public function product()
     {
@@ -25,3 +35,4 @@ class StockTransaction extends Model
         return $this->belongsTo(User::class);
     }
 }
+

@@ -44,9 +44,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('suppliers', SupplierController::class);
         
         // Rute untuk Stock Management
-        Route::get('stock', [StockController::class, 'index'])->name('stock.index');
-        Route::get('stock/create', [StockController::class, 'create'])->name('stock.create');
-        Route::post('stock', [StockController::class, 'store'])->name('stock.store');
+        Route::get('stock', [StockTransactionController::class, 'index'])->name('stock.index');
+        Route::get('stock/create', [StockTransactionController::class, 'create'])->name('stock.create');
+        Route::post('stock', [StockTransactionController::class, 'store'])->name('stock.store');
     });
 
      // Grup Rute untuk MANAGER
