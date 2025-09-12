@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 
@@ -13,11 +14,15 @@ use App\Http\Controllers\Admin\UserController; // Controller baru
 use App\Http\Controllers\Admin\ReportController; // Controller baru
 
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
+use App\Http\Controllers\Manager\StockController;
 // Jika Anda belum punya Controller Manajer, buatlah. Untuk sementara bisa pakai yang Admin.
 // use App\Http\Controllers\Manager\ProductController as ManagerProductController;
 // use App\Http\Controllers\Manager\StockController as ManagerStockController;
 
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\StaffStockController;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+
 // Jika Anda belum punya Controller Staff, buatlah. Untuk sementara bisa pakai yang Admin.
 
 /*
@@ -81,6 +86,12 @@ Route::middleware('auth')->group(function () {
     // Staff, Manajer, dan Admin bisa mengakses ini
     Route::middleware('role:staff,manager,admin')->prefix('staff')->name('staff.')->group(function () {
         Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+        // Halaman untuk menampilkan detail konfirmasi
+        Route::get('stock/{transaction}/confirm', [StaffStockController::class, 'showConfirm'])->name('stock.confirm');
+        
+        // Aksi untuk memproses konfirmasi
+        Route::post('stock/{transaction}/confirm', [StaffStockController::class, 'processConfirm'])->name('stock.processConfirm');
+        Route::post('stock/{transaction}/cancel', [StaffStockController::class, 'processCancel'])->name('stock.processCancel');
         // Contoh: Rute untuk staff konfirmasi barang
         // Route::post('tasks/{task}/confirm', [StaffTaskController::class, 'confirm'])->name('tasks.confirm');
     });

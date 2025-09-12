@@ -52,11 +52,10 @@
                 </a>
 
             {{-- =================== MENU FOR STAFF =================== --}}
-            @elseif($userRole == 'staff')
-                <a href="{{ route('staff.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
-                    {{ request()->routeIs('staff.dashboard') ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 dark:text-gray-200' }}">
-                    <i class="bi bi-house-door-fill"></i> Dashboard
-                </a>
+            @elseif(Auth::user()->role == 'staff')
+            <a href="{{ route('staff.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium {{ request()->routeIs('staff.dashboard') ? 'bg-blue-100 text-blue-600 dark:bg-gray-700 dark:text-white' : 'hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700' }}">
+                <i class="bi bi-list-task"></i> Daftar Tugas
+            </a>
             @endif
         @endif
     </nav>

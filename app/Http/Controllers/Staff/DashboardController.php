@@ -8,14 +8,19 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    /**
+     * Menampilkan dashboard untuk Staff, yang berisi daftar tugas
+     * (transaksi yang perlu dikonfirmasi).
+     */
     public function index()
     {
-        // Hanya menampilkan daftar tugas yang perlu dikerjakan
-        $pendingTasks = StockTransaction::with('product')
-            ->where('status', 'pending')
-            ->latest('date')
-            ->get();
+        // Ambil semua transaksi yang statusnya 'pending'
+        $pendingTasks = StockTransaction::where('status', 'pending')
+            ->with(['product', 'user']) // Eager load relasi untuk efisiensi
+            ->latest()
+            ->paginate(10);
 
         return view('pages.staff.dashboard', compact('pendingTasks'));
     }
 }
+
