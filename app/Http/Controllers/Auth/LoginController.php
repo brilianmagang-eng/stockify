@@ -38,12 +38,10 @@ class LoginController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             } elseif ($user->role === 'manager') {
                 // Arahkan ke dashboard manager (saat nanti dibuat)
-                // return redirect()->intended(route('manager.dashboard'));
-                return redirect()->intended(route('admin.dashboard')); // Sementara ke admin dulu
+                return redirect()->intended(route('manager.dashboard'));
             } elseif ($user->role === 'staff') {
                 // Arahkan ke dashboard staff (saat nanti dibuat)
-                // return redirect()->intended(route('staff.dashboard'));
-                return redirect()->intended(route('admin.dashboard')); // Sementara ke admin dulu
+                return redirect()->intended(route('staff.dashboard'));
             }
 
             // Fallback jika role tidak terdefinisi (seharusnya tidak terjadi)
