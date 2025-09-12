@@ -7,85 +7,61 @@ use App\Models\Product;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
-    // Menampilkan form untuk mencatat BARANG MASUK
     public function createIn()
     {
-        $products = Product::orderBy('name')->get();
-        return view('pages.manager.stock.create-in', compact('products'));
-    }
-
-    // Menyimpan data BARANG MASUK
-    public function storeIn(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'notes' => 'nullable|string',
+        $products = Product::orderBy('name', 'asc')->get();
+        return view('pages.manager.stock.create', [
+            'type' => 'in',
+            'products' => $products
         ]);
-
-        DB::transaction(function () use ($request) {
-            // 1. Catat transaksi
-            StockTransaction::create([
-                'product_id' => $request->product_id,
-                'user_id' => Auth::id(),
-                'type' => 'in',
-                'quantity' => $request->quantity,
-                'notes' => $request->notes,
-                'date' => now(),
-                'status' => 'completed', // Manajer langsung complete
-            ]);
-
-            // 2. Update stok produk
-            $product = Product::find($request->product_id);
-            $product->increment('stock', $request->quantity);
-        });
-
-        return redirect()->route('manager.dashboard')->with('success', 'Stock-in recorded successfully.');
     }
-    
-    // Menampilkan form untuk mencatat BARANG KELUAR
+
     public function createOut()
     {
-        $products = Product::orderBy('name')->get();
-        return view('pages.manager.stock.create-out', compact('products'));
+        $products = Product::orderBy('name', 'asc')->get();
+        return view('pages.manager.stock.create', [
+            'type' => 'out',
+            'products' => $products
+        ]);
     }
 
-    // Menyimpan data BARANG KELUAR
-    public function storeOut(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
+            'type' => 'required|in:in,out',
             'quantity' => 'required|integer|min:1',
+            'date' => 'required|date',
             'notes' => 'nullable|string',
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
-        // Validasi tambahan agar stok tidak minus
-        if ($product->stock < $request->quantity) {
-            return back()->withErrors(['quantity' => 'Insufficient stock. Available: ' . $product->stock])->withInput();
+        if ($request->type == 'out' && $product->stock < $request->quantity) {
+            return back()->with('error', 'Stock is not sufficient for this transaction.');
         }
 
-        DB::transaction(function () use ($request, $product) {
-            // 1. Catat transaksi
-            StockTransaction::create([
-                'product_id' => $request->product_id,
-                'user_id' => Auth::id(),
-                'type' => 'out',
-                'quantity' => $request->quantity,
-                'notes' => $request->notes,
-                'date' => now(),
-                'status' => 'completed',
-            ]);
+        StockTransaction::create([
+            'product_id' => $request->product_id,
+            'user_id' => Auth::id(),
+            'type' => $request->type,
+            'quantity' => $request->quantity,
+            'date' => $request->date,
+            'status' => 'completed',
+            'notes' => $request->notes,
+        ]);
 
-            // 2. Update stok produk
+        if ($request->type == 'in') {
+            $product->increment('stock', $request->quantity);
+        } else {
             $product->decrement('stock', $request->quantity);
-        });
+        }
 
-        return redirect()->route('manager.dashboard')->with('success', 'Stock-out recorded successfully.');
+        $message = $request->type == 'in' ? 'Incoming stock recorded successfully.' : 'Outgoing stock recorded successfully.';
+        
+        return redirect()->route('manager.dashboard')->with('success', $message);
     }
 }

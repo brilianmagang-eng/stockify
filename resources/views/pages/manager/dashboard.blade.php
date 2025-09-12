@@ -2,37 +2,30 @@
 
 @section('content')
 <div class="p-6">
-    {{-- Baris Judul dan Sambutan --}}
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Manager Dashboard</h1>
         <p class="text-gray-600 dark:text-gray-400">Welcome back, {{ Auth::user()->name }}! Here are the operational highlights.</p>
     </div>
 
-    {{-- Grid untuk Kartu Peringatan --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <!-- Low Stock Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-sm font-medium text-red-500 dark:text-red-400">Products with Low Stock</h3>
             <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ $lowStockCount ?? 0 }}</p>
         </div>
-        <!-- Incoming Transactions Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Incoming Transactions (Today)</h3>
             <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ $incomingTransactionsToday ?? 0 }}</p>
         </div>
-        <!-- Outgoing Transactions Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Outgoing Transactions (Today)</h3>
             <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ $outgoingTransactionsToday ?? 0 }}</p>
         </div>
-        <!-- Pending Tasks Card -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-sm font-medium text-yellow-500 dark:text-yellow-400">Pending Tasks</h3>
             <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ $pendingTasksCount ?? 0 }}</p>
         </div>
     </div>
 
-    {{-- Tabel Produk Stok Rendah --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Low Stock Product Details</h3>
         <div class="relative overflow-x-auto">
