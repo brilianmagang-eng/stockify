@@ -53,6 +53,10 @@
                     {{ request()->routeIs('manager.stock.createOut') ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 dark:text-gray-200' }}">
                     <i class="bi bi-box-arrow-up"></i> Record Item Out
                 </a>
+                <a href="{{ route('manager.stock.opnameCreate') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium
+                    {{ request()->routeIs('manager.stock.opnameCreate') ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 dark:text-gray-200' }}">
+                    <i class="bi bi-clipboard-check"></i> Stock Opname
+                </a>
 
             {{-- =================== MENU UNTUK STAFF =================== --}}
             @elseif($userRole == 'staff')

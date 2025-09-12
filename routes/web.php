@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock/in/create', [ManagerStockController::class, 'createIn'])->name('stock.createIn');
         Route::get('/stock/out/create', [ManagerStockController::class, 'createOut'])->name('stock.createOut');
         Route::post('/stock', [ManagerStockController::class, 'store'])->name('stock.store');
+        Route::get('/stock/opname', [\App\Http\Controllers\Manager\StockController::class, 'opnameCreate'])->name('stock.opnameCreate');
+        Route::post('/stock/opname', [\App\Http\Controllers\Manager\StockController::class, 'opnameStore'])->name('stock.opnameStore');
     });
 
     // Grup Rute untuk STAFF
