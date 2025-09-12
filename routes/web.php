@@ -17,6 +17,7 @@ use App\Http\Controllers\Manager\ProductController as ManagerProductController;
 use App\Http\Controllers\Manager\StockController as ManagerStockController;
 
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\StaffStockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,9 +69,18 @@ Route::middleware('auth')->group(function () {
     });
 
     // Grup Rute untuk STAFF
-    Route::middleware('role:staff,manager,admin')->prefix('staff')->name('staff.')->group(function () {
-        Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
-        Route::patch('/tasks/{transaction}/update', [StaffDashboardController::class, 'updateStatus'])->name('tasks.update');
-    });
+    Route::middleware('role:staff')->prefix('staff')->name('staff.')->group(function () {
+    // Dashboard (Daftar Tugas)
+    Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+    
+    // Halaman untuk menampilkan detail konfirmasi
+    Route::get('stock/{transaction}/confirm', [StaffStockController::class, 'showConfirm'])->name('stock.confirm');
+    
+    // Aksi untuk memproses konfirmasi
+    Route::post('stock/{transaction}/confirm', [StaffStockController::class, 'processConfirm'])->name('stock.processConfirm');
+    
+    // RUTE BARU: Aksi untuk membatalkan transaksi
+    Route::post('stock/{transaction}/cancel', [StaffStockController::class, 'processCancel'])->name('stock.processCancel');
+});
 
 });
