@@ -19,7 +19,7 @@
         <form action="{{ route('admin.suppliers.store') }}" method="POST">
             @csrf
             
-            {{-- Memanggil semua field input dari file partial --}}
+            {{-- INI BAGIAN PENTING YANG KEMUNGKINAN HILANG --}}
             @include('pages.admin.suppliers.partials.form-fields')
 
             {{-- Tombol Aksi --}}
@@ -35,3 +35,4 @@
     </div>
 </div>
 @endsection
+

@@ -9,11 +9,22 @@ class Supplier extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'name', 'address', 'phone', 'email'
+        'name',
+        'email',
+        'phone',
+        'address',
     ];
 
-    // Relasi ke Produk
+    /**
+     * Relasi ke model Product.
+     * Satu supplier bisa memiliki banyak produk.
+     */
     public function products()
     {
         return $this->hasMany(Product::class);
