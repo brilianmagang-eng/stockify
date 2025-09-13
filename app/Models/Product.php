@@ -11,15 +11,11 @@ class Product extends Model
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'products'; // <-- TAMBAHKAN BARIS INI
+    protected $table = 'products';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
      */
     protected $fillable = [
         'name', 'sku', 'description', 'purchase_price', 'selling_price',
@@ -47,7 +43,9 @@ class Product extends Model
      */
     public function attributes()
     {
-        return $this->hasMany(ProductAttribute::class); // Pastikan nama model ini benar
+        // --- PERBAIKAN DI SINI ---
+        // Menggunakan nama kelas yang benar: ProductAttributes (dengan 's')
+        return $this->hasMany(ProductAttributes::class);
     }
 
     /**

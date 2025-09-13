@@ -10,14 +10,16 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\StockTransactionController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Http\Controllers\Manager\ProductController as ManagerProductController;
 use App\Http\Controllers\Manager\StockController as ManagerStockController;
+use App\Http\Controllers\Manager\ReportController as ManagerReportController;
+use App\Http\Controllers\Manager\ProductAttributeController;
 
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
-use App\Http\Controllers\Staff\StaffStockController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,17 +27,17 @@ use App\Http\Controllers\Staff\StaffStockController;
 |--------------------------------------------------------------------------
 */
 
-// Halaman utama ('/') akan dialihkan ke login jika belum login
+// Halaman utama ('/') akan dialihkan
 Route::get('/', function () {
     if (!auth()->check()) {
         return redirect()->route('login');
     }
-    // Jika sudah login, arahkan ke dashboard sesuai peran
     $role = auth()->user()->role;
     if ($role == 'admin') return redirect()->route('admin.dashboard');
     if ($role == 'manager') return redirect()->route('manager.dashboard');
     if ($role == 'staff') return redirect()->route('staff.dashboard');
 });
+Route::get('/search', [SearchController::class, 'results'])->name('search.results');
 
 // Rute untuk login dan logout
 Route::get('login', [LoginController::class, 'create'])->name('login');
@@ -56,7 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::get('stock/create', [StockTransactionController::class, 'create'])->name('stock.create');
         Route::post('stock', [StockTransactionController::class, 'store'])->name('stock.store');
         Route::resource('users', UserController::class);
-        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
     });
 
     // Grup Rute untuk MANAGER
@@ -66,23 +68,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock/in/create', [ManagerStockController::class, 'createIn'])->name('stock.createIn');
         Route::get('/stock/out/create', [ManagerStockController::class, 'createOut'])->name('stock.createOut');
         Route::post('/stock', [ManagerStockController::class, 'store'])->name('stock.store');
-        Route::get('/stock/opname', [\App\Http\Controllers\Manager\StockController::class, 'opnameCreate'])->name('stock.opnameCreate');
-        Route::post('/stock/opname', [\App\Http\Controllers\Manager\StockController::class, 'opnameStore'])->name('stock.opnameStore');
+        Route::get('/stock/opname', [ManagerStockController::class, 'opnameCreate'])->name('stock.opnameCreate');
+        Route::post('/stock/opname', [ManagerStockController::class, 'opnameStore'])->name('stock.opnameStore');
+        Route::post('/products/{product}/attributes', [ProductAttributeController::class, 'store'])->name('products.attributes.store');
+        Route::delete('/attributes/{attribute}', [ProductAttributeController::class, 'destroy'])->name('attributes.destroy');
+        Route::get('/reports', [ManagerReportController::class, 'index'])->name('reports.index');
     });
 
     // Grup Rute untuk STAFF
-    Route::middleware('role:staff')->prefix('staff')->name('staff.')->group(function () {
-    // Dashboard (Daftar Tugas)
-    Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
-    
-    // Halaman untuk menampilkan detail konfirmasi
-    Route::get('stock/{transaction}/confirm', [StaffStockController::class, 'showConfirm'])->name('stock.confirm');
-    
-    // Aksi untuk memproses konfirmasi
-    Route::post('stock/{transaction}/confirm', [StaffStockController::class, 'processConfirm'])->name('stock.processConfirm');
-    
-    // RUTE BARU: Aksi untuk membatalkan transaksi
-    Route::post('stock/{transaction}/cancel', [StaffStockController::class, 'processCancel'])->name('stock.processCancel');
-});
+    Route::middleware('role:staff,manager,admin')->prefix('staff')->name('staff.')->group(function () {
+        Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+        // Route::patch('/tasks/{transaction}/update', [StaffDashboardController::class, 'updateStatus'])->name('tasks.update');
+        Route::get('/stock/confirm', [StaffDashboardController::class, 'index'])->name('stock.confirm');
+        Route::patch('/tasks/{transaction}/update', [\App\Http\Controllers\Staff\DashboardController::class, 'updateStatus'])->name('tasks.update');
+    });
 
 });

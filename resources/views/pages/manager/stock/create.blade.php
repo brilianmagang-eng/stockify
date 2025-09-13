@@ -12,6 +12,7 @@
             <input type="hidden" name="type" value="{{ $type }}">
 
             <div class="grid gap-6 mb-6 md:grid-cols-2">
+                {{-- Product --}}
                 <div>
                     <label for="product_id" class="block mb-2 text-sm font-medium">Product</label>
                     <select id="product_id" name="product_id" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" required>
@@ -23,18 +24,21 @@
                     @error('product_id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
                 
+                {{-- Quantity --}}
                 <div>
                     <label for="quantity" class="block mb-2 text-sm font-medium">Quantity</label>
                     <input type="number" id="quantity" name="quantity" value="{{ old('quantity') }}" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" required min="1">
                     @error('quantity')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
                 
+                {{-- Date --}}
                 <div>
                     <label for="date" class="block mb-2 text-sm font-medium">Transaction Date</label>
                     <input type="date" id="date" name="date" value="{{ old('date', date('Y-m-d')) }}" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5" required>
                     @error('date')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
 
+                {{-- Supplier --}}
                 @if($type == 'in')
                 <div>
                     <label for="supplier_id" class="block mb-2 text-sm font-medium">Supplier</label>
@@ -49,12 +53,20 @@
                 @endif
             </div>
 
+            {{-- Notes --}}
             <div class="mb-6">
                 <label for="notes" class="block mb-2 text-sm font-medium">Notes (Optional)</label>
                 <textarea id="notes" name="notes" rows="4" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5">{{ old('notes') }}</textarea>
                 @error('notes')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
 
+            {{-- --- CHECKBOX DELEGASI TUGAS --- --}}
+            <div class="flex items-center mb-6">
+                <input id="assign_to_staff" name="assign_to_staff" type="checkbox" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                <label for="assign_to_staff" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Assign to Staff for confirmation (creates a pending task)</label>
+            </div>
+
+            {{-- Action Buttons --}}
             <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Record Transaction</button>
             <a href="{{ route('manager.dashboard') }}" class="py-2.5 px-5 ms-3 text-sm font-medium bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Cancel</a>
         </form>

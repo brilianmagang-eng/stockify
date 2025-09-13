@@ -4,7 +4,6 @@
         <span class="text-lg font-bold dark:text-white">Stockify</span>
     </div>
     <nav class="space-y-2">
-
         @if(Auth::check())
             @php $userRole = Auth::user()->role; @endphp
 
@@ -57,6 +56,11 @@
                     {{ request()->routeIs('manager.stock.opnameCreate') ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 dark:text-gray-200' }}">
                     <i class="bi bi-clipboard-check"></i> Stock Opname
                 </a>
+                {{-- --- MENU BARU DITAMBAHKAN DI SINI --- --}}
+                <a href="{{ route('manager.reports.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
+                    {{ request()->routeIs('manager.reports.index') ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 dark:text-gray-200' }}">
+                    <i class="bi bi-graph-up"></i> Reports
+                </a>
 
             {{-- =================== MENU UNTUK STAFF =================== --}}
             @elseif($userRole == 'staff')
@@ -66,7 +70,7 @@
                 </a>
             @endif
 
-            {{-- Tombol Logout akan selalu ada di bagian bawah untuk semua role --}}
+            {{-- Tombol Logout --}}
             <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

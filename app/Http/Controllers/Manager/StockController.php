@@ -5,22 +5,21 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\StockTransaction;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
-
 
 class StockController extends Controller
 {
     public function createIn()
     {
         $products = Product::orderBy('name', 'asc')->get();
-        $suppliers = Supplier::orderBy('name', 'asc')->get(); // Ambil data supplier
+        $suppliers = Supplier::orderBy('name', 'asc')->get();
         return view('pages.manager.stock.create', [
             'type' => 'in',
             'products' => $products,
-            'suppliers' => $suppliers // Kirim data supplier ke view
+            'suppliers' => $suppliers
         ]);
     }
 
@@ -30,10 +29,13 @@ class StockController extends Controller
         return view('pages.manager.stock.create', [
             'type' => 'out',
             'products' => $products,
-            'suppliers' => null // Tidak perlu supplier untuk barang keluar
+            'suppliers' => null
         ]);
     }
 
+    /**
+     * Menyimpan transaksi stok baru (baik masuk maupun keluar).
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -41,51 +43,55 @@ class StockController extends Controller
             'type' => 'required|in:in,out',
             'quantity' => 'required|integer|min:1',
             'date' => 'required|date',
-            'supplier_id' => 'required_if:type,in|nullable|exists:suppliers,id', // Validasi supplier
+            'supplier_id' => 'required_if:type,in|nullable|exists:suppliers,id',
             'notes' => 'nullable|string',
+            'assign_to_staff' => 'nullable|boolean', // Validasi untuk checkbox baru
         ]);
 
         $product = Product::findOrFail($request->product_id);
+        $isAssignedToStaff = $request->has('assign_to_staff');
 
-        if ($request->type == 'out' && $product->stock < $request->quantity) {
+        // Jika tidak ditugaskan ke staff, validasi stok untuk barang keluar
+        if (!$isAssignedToStaff && $request->type == 'out' && $product->stock < $request->quantity) {
             return back()->with('error', 'Stock is not sufficient for this transaction.');
         }
+
+        // Tentukan status berdasarkan checkbox
+        $status = $isAssignedToStaff ? 'pending' : 'completed';
 
         StockTransaction::create([
             'product_id' => $request->product_id,
             'user_id' => Auth::id(),
-            'supplier_id' => $request->supplier_id, // Simpan supplier_id
+            'supplier_id' => $request->supplier_id,
             'type' => $request->type,
             'quantity' => $request->quantity,
             'date' => $request->date,
-            'status' => 'completed',
+            'status' => $status,
             'notes' => $request->notes,
         ]);
 
-        if ($request->type == 'in') {
-            $product->increment('stock', $request->quantity);
-        } else {
-            $product->decrement('stock', $request->quantity);
+        // HANYA perbarui stok jika tugas tidak ditugaskan ke staff (langsung completed)
+        if (!$isAssignedToStaff) {
+            if ($request->type == 'in') {
+                $product->increment('stock', $request->quantity);
+            } else {
+                $product->decrement('stock', $request->quantity);
+            }
         }
 
-        $message = $request->type == 'in' ? 'Incoming stock recorded successfully.' : 'Outgoing stock recorded successfully.';
+        $message = $isAssignedToStaff 
+            ? 'Task has been assigned to staff successfully.' 
+            : ($request->type == 'in' ? 'Incoming stock recorded successfully.' : 'Outgoing stock recorded successfully.');
         
         return redirect()->route('manager.dashboard')->with('success', $message);
     }
     
-    // ... method untuk stock opname akan ditambahkan di bawah ...
-    /**
-     * Menampilkan halaman formulir Stock Opname.
-     */
     public function opnameCreate()
     {
         $products = Product::orderBy('name', 'asc')->get();
         return view('pages.manager.stock.opname', compact('products'));
     }
 
-    /**
-     * Menyimpan hasil Stock Opname.
-     */
     public function opnameStore(Request $request)
     {
         $request->validate([
@@ -98,18 +104,15 @@ class StockController extends Controller
             $product = Product::findOrFail($request->product_id);
             $physicalStock = (int) $request->physical_stock;
             $systemStock = $product->stock;
-
             $variance = $physicalStock - $systemStock;
 
             if ($variance == 0) {
                 return redirect()->route('manager.stock.opnameCreate')->with('success', 'No changes detected for ' . $product->name . '.');
             }
 
-            // Perbarui stok produk
             $product->stock = $physicalStock;
             $product->save();
 
-            // Catat transaksi penyesuaian (tipe baru 'adjustment')
             StockTransaction::create([
                 'product_id' => $product->id,
                 'user_id' => Auth::id(),
