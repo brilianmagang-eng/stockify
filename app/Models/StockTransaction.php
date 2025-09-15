@@ -20,7 +20,7 @@ class StockTransaction extends Model
      * @var array
      */
     protected $casts = [
-        'date' => 'datetime', // <-- INI YANG PERLU DITAMBAHKAN
+        'date' => 'datetime',
     ];
 
     // Relasi ke Produk

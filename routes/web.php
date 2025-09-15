@@ -44,6 +44,11 @@ Route::get('login', [LoginController::class, 'create'])->name('login');
 Route::post('login', [LoginController::class, 'store']);
 Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
+// Route::get('forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+// Route::post('forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
+// Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+// Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
+
 
 // Grup Rute yang Dilindungi Middleware Autentikasi
 Route::middleware('auth')->group(function () {
@@ -82,5 +87,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock/confirm', [StaffDashboardController::class, 'index'])->name('stock.confirm');
         Route::patch('/tasks/{transaction}/update', [\App\Http\Controllers\Staff\DashboardController::class, 'updateStatus'])->name('tasks.update');
     });
-
 });

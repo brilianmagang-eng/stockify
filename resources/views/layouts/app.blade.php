@@ -33,7 +33,6 @@
                     @yield('content')
                 </main>
 
-                {{-- Memanggil Footer jika ada --}}
                 {{-- @include('layouts.partials.footer') --}}
             </div>
         </div>

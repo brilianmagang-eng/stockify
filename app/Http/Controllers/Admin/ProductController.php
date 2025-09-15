@@ -60,7 +60,6 @@ class ProductController extends Controller
         $categories = Category::all();
         $suppliers = Supplier::all();
 
-        // --- PERBAIKAN DI SINI ---
         // Mengarahkan ke view 'edit.blade.php'
         return view('pages.admin.products.edit', [
             'product' => $product,

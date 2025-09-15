@@ -23,7 +23,6 @@ class DashboardController extends Controller
         $totalIncomingItems = \App\Models\StockTransaction::where('type', 'in')->sum('quantity');
         $totalOutgoingItems = \App\Models\StockTransaction::where('type', 'out')->sum('quantity');
 
-        // --- TAMBAHAN DATA BARU DI SINI ---
 
         // 2. Data untuk Grafik Stok Kritis
         // Mengambil 5 produk dengan stok terendah untuk ditampilkan di grafik.

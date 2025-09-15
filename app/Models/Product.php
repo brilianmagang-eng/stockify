@@ -43,7 +43,6 @@ class Product extends Model
      */
     public function attributes()
     {
-        // --- PERBAIKAN DI SINI ---
         // Menggunakan nama kelas yang benar: ProductAttributes (dengan 's')
         return $this->hasMany(ProductAttributes::class);
     }

@@ -28,7 +28,6 @@ class ReportController extends Controller
         
         $users = User::all();
 
-        // --- PERBAIKAN DI SINI ---
         return view('pages.admin.reports.index', compact('stockReports', 'transactionReports', 'userActivityReports', 'users'));
     }
 }

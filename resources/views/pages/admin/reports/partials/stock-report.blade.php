@@ -4,10 +4,10 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">SKU</th>
-                <th scope="col" class="px-6 py-3">Nama Produk</th>
-                <th scope="col" class="px-6 py-3">Kategori</th>
-                <th scope="col" class="px-6 py-3">Stok</th>
-                <th scope="col" class="px-6 py-3">Stok Min.</th>
+                <th scope="col" class="px-6 py-3">Product Name</th>
+                <th scope="col" class="px-6 py-3">Category</th>
+                <th scope="col" class="px-6 py-3">Stock</th>
+                <th scope="col" class="px-6 py-3">Stock Min.</th>
                 <th scope="col" class="px-6 py-3">Status</th>
             </tr>
         </thead>
@@ -25,7 +25,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="text-center p-4">Tidak ada data.</td></tr>
+            <tr><td colspan="6" class="text-center p-4">No data.</td></tr>
             @endforelse
         </tbody>
     </table>

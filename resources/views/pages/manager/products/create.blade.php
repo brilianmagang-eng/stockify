@@ -8,8 +8,6 @@
         <form action="{{ route('manager.products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Memanggil semua field input dari file partial. Pastikan path ini benar. --}}
-            {{-- Jika Anda menyalinnya, seharusnya lokasinya sudah benar. --}}
             @include('pages.manager.products.partials.form-fields')
 
             {{-- Tombol Aksi --}}

@@ -15,7 +15,6 @@ class DashboardController extends Controller
     public function index()
     {
         // Ambil semua transaksi yang statusnya 'pending'
-        // --- PERBAIKAN DI SINI: Mengubah get() menjadi paginate() ---
         $pendingTasks = StockTransaction::where('status', 'pending')
             ->with(['product', 'user']) // Eager load relasi untuk efisiensi
             ->latest('date')

@@ -6,7 +6,6 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="bi bi-search text-gray-500"></i>
                 </div>
-                {{-- --- PERBAIKAN DI SINI --- --}}
                 <input type="search" name="query" id="default-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" placeholder="Search products by name or SKU..." value="{{ $query ?? '' }}">
             </div>
         </form>

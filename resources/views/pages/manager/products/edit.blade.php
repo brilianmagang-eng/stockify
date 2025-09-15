@@ -5,13 +5,10 @@
     <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Product</h1>
 
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        {{-- PERBAIKAN DI SINI: Action form didefinisikan dengan benar --}}
         <form action="{{ route('manager.products.update', $product) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
-            {{-- Memanggil semua field input dari file partial --}}
-            {{-- Pastikan path ini benar sesuai struktur folder Anda --}}
             @include('pages.manager.products.partials.form-fields')
 
             {{-- Tombol Aksi --}}
